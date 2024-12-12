@@ -1,1 +1,2 @@
 # puru-kogi-testbot
+てすとだよ
