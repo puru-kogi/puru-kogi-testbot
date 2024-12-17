@@ -46,7 +46,8 @@ var (
 
 func main() {
 	var err error
-	botToken := os.Getenv("YOUR_BOT_TOKEN")
+	// botToken := os.Getenv("YOUR_BOT_TOKEN")
+	botToken := "8103708621:AAGaVVH37H8EhfCoLR67RQy7Hdh31XXqt6E"
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		// Abort if something is wrong
@@ -158,24 +159,17 @@ func handleMessage(message *tgbotapi.Message) {
 	user := message.From
 	text := message.Text
 
-	// botname := "8103708621:AAGaVVH37H8EhfCoLR67RQy7Hdh31XXqt6E"
-	// chatid := int64(123)
-	// countconfig, _ := tgbotapi.ChatMemberConfig(message.Chat.ID, user.UserName, botname, chatid)
-	// count, _ := bot.GetChatMembersCount(countconfig)
 	if user == nil {
 		return
 	}
 
-	// Print to console
-	// log.Printf("%d member count", count)
 	log.Printf("%s wrote %s", user.FirstName, text)
-	log.Printf("id : %d firstName : %s LastName : %s LanguageCode : %s UserName : %s", user.ID, user.FirstName, user.LastName, user.LanguageCode, user.UserName)
 	if isExtraMessage(message) {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
-		if strings.Contains(user.FirstName, "ВitGеt") || strings.Contains(user.FirstName, "АirDrор") {
-			log.Printf("check airdrop")
-
+		var lowerName = strings.ToLower(user.FirstName)
+		if strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "bot") {
+			log.Printf("id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
 			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 			restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
 				Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
@@ -190,26 +184,28 @@ func handleMessage(message *tgbotapi.Message) {
 			_, _ = bot.Request(restrictChatMemberConfig)
 			_, _ = bot.Request(banChatMemberConfig)
 			return
+		} else {
+			log.Printf("id : %d firstName : %s LastName : %s Del only", user.ID, user.FirstName, user.LastName)
 		}
 	}
 
-	var err error
-	webhook, err := bot.GetWebhookInfo()
-	log.Printf("%v", webhook)
-	if strings.HasPrefix(text, "/") {
-		err = handleCommand(message.Chat.ID, text)
-	} else if screaming && len(text) > 0 {
-		msg := tgbotapi.NewMessage(message.Chat.ID, strings.ToUpper(text))
-		// To preserve markdown, we attach entities (bold, italic..)
-		msg.Entities = message.Entities
-		// _, err = bot.Send(msg)
-		log.Printf("%s wrote %s", user.FirstName, msg)
-	} else {
-		// This is equivalent to forwarding, without the sender's name
-		copyMsg := tgbotapi.NewCopyMessage(message.Chat.ID, message.Chat.ID, message.MessageID)
-		// _, err = bot.CopyMessage(copyMsg)
-		log.Printf("%s wrote %s", user.FirstName, copyMsg)
-	}
+	// var err error
+	// webhook, err := bot.GetWebhookInfo()
+	// log.Printf("%v", webhook)
+	// if strings.HasPrefix(text, "/") {
+	// 	err = handleCommand(message.Chat.ID, text)
+	// } else if screaming && len(text) > 0 {
+	// 	msg := tgbotapi.NewMessage(message.Chat.ID, strings.ToUpper(text))
+	// 	// To preserve markdown, we attach entities (bold, italic..)
+	// 	msg.Entities = message.Entities
+	// 	// _, err = bot.Send(msg)
+	// 	log.Printf("%s wrote %s", user.FirstName, msg)
+	// } else {
+	// 	// This is equivalent to forwarding, without the sender's name
+	// 	copyMsg := tgbotapi.NewCopyMessage(message.Chat.ID, message.Chat.ID, message.MessageID)
+	// 	// _, err = bot.CopyMessage(copyMsg)
+	// 	log.Printf("%s wrote %s", user.FirstName, copyMsg)
+	// }
 
 	if err != nil {
 		log.Printf("An error occured: %s", err.Error())
