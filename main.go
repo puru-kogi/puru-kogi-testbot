@@ -46,8 +46,7 @@ var (
 
 func main() {
 	var err error
-	// botToken := os.Getenv("YOUR_BOT_TOKEN")
-	botToken := "8103708621:AAGaVVH37H8EhfCoLR67RQy7Hdh31XXqt6E"
+	botToken := os.Getenv("YOUR_BOT_TOKEN")
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		// Abort if something is wrong
