@@ -167,7 +167,7 @@ func handleMessage(message *tgbotapi.Message) {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		var lowerName = strings.ToLower(user.FirstName)
-		if strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
+		if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
 			log.Printf("del message id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
 			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 			restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
