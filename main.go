@@ -156,19 +156,19 @@ func handleChatJoinRequest(member *tgbotapi.ChatJoinRequest) {
 
 func handleMessage(message *tgbotapi.Message) {
 	user := message.From
-	text := message.Text
+	// text := message.Text
 
 	if user == nil {
 		return
 	}
 
-	log.Printf("%s wrote %s", user.FirstName, text)
+	// log.Printf("%s wrote %s", user.FirstName, text)
 	if isExtraMessage(message) {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		var lowerName = strings.ToLower(user.FirstName)
 		if strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
-			log.Printf("id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
+			log.Printf("del message id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
 			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 			restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
 				Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
@@ -184,11 +184,11 @@ func handleMessage(message *tgbotapi.Message) {
 			_, _ = bot.Request(banChatMemberConfig)
 			return
 		} else {
-			log.Printf("id : %d firstName : %s LastName : %s Del only", user.ID, user.FirstName, user.LastName)
+			log.Printf("del message id : %d firstName : %s LastName : %s Del only", user.ID, user.FirstName, user.LastName)
 		}
 	}
 
-	// var err error
+	var err error
 	// webhook, err := bot.GetWebhookInfo()
 	// log.Printf("%v", webhook)
 	// if strings.HasPrefix(text, "/") {
