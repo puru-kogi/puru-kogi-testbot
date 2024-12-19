@@ -46,8 +46,7 @@ var (
 
 func main() {
 	var err error
-	// botToken := os.Getenv("YOUR_BOT_TOKEN")
-	botToken := "8103708621:AAGaVVH37H8EhfCoLR67RQy7Hdh31XXqt6E"
+	botToken := os.Getenv("YOUR_BOT_TOKEN")
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		// Abort if something is wrong
@@ -168,7 +167,7 @@ func handleMessage(message *tgbotapi.Message) {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		var lowerName = strings.ToLower(user.FirstName)
-		if strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "bot") {
+		if strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
 			log.Printf("id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
 			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 			restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
