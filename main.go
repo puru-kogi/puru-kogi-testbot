@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -166,26 +165,26 @@ func handleMessage(message *tgbotapi.Message) {
 	if isExtraMessage(message) {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
-		var lowerName = strings.ToLower(user.FirstName)
-		if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
-			log.Printf("del message id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
-			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
-			restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
-				Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
-					CanSendMediaMessages:  false,
-					CanSendPolls:          false,
-					CanSendOtherMessages:  false,
-					CanAddWebPagePreviews: false,
-					CanChangeInfo:         false,
-					CanInviteUsers:        false,
-					CanPinMessages:        false}}
-			banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
-			_, _ = bot.Request(restrictChatMemberConfig)
-			_, _ = bot.Request(banChatMemberConfig)
-			return
-		} else {
-			log.Printf("del message id : %d firstName : %s LastName : %s Del only", user.ID, user.FirstName, user.LastName)
-		}
+		// var lowerName = strings.ToLower(user.FirstName)
+		// if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
+		log.Printf("del message id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
+		memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
+		restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
+			Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
+				CanSendMediaMessages:  false,
+				CanSendPolls:          false,
+				CanSendOtherMessages:  false,
+				CanAddWebPagePreviews: false,
+				CanChangeInfo:         false,
+				CanInviteUsers:        false,
+				CanPinMessages:        false}}
+		banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
+		_, _ = bot.Request(restrictChatMemberConfig)
+		_, _ = bot.Request(banChatMemberConfig)
+		return
+		// } else {
+		// 	log.Printf("del message id : %d firstName : %s LastName : %s Del only", user.ID, user.FirstName, user.LastName)
+		// }
 	}
 
 	var err error
