@@ -121,7 +121,7 @@ func handleUpdate(update tgbotapi.Update) {
 		break
 	default:
 		// log.Printf("%v", update)
-		webhook, _ := bot.GetWebhookInfo()
+		// webhook, _ := bot.GetWebhookInfo()
 		// log.Printf("%v", webhook)
 		break
 	}
