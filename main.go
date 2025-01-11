@@ -110,7 +110,7 @@ func handleUpdate(update tgbotapi.Update) {
 		break
 	// Handle messages
 	case update.Message != nil:
-		log.Printf("Message")
+		// log.Printf("Message")
 		handleMessage(update.Message)
 		break
 
@@ -128,22 +128,6 @@ func handleUpdate(update tgbotapi.Update) {
 }
 
 func handleChatJoinRequest(member *tgbotapi.ChatJoinRequest) {
-	firstName := member.From.FirstName
-	lname := member.From.LastName
-	uname := member.From.UserName
-	iden := member.From.ID
-	// user := member.From.LanguageCode
-	// if user == nil {
-	// 	return
-	// }
-
-	// Print to console
-	fmt.Printf(firstName)
-	fmt.Printf(lname)
-	fmt.Printf(uname)
-	log.Printf("%d", iden)
-	// var err error
-	fmt.Printf("%+v\n", member)
 	// str := fmt.Sprintf("%+v\n", member)
 	// msg := tgbotapi.NewMessage(member.Chat.ID, str)
 	// _, err = bot.Send(msg)
@@ -155,13 +139,13 @@ func handleChatJoinRequest(member *tgbotapi.ChatJoinRequest) {
 
 func handleMessage(message *tgbotapi.Message) {
 	user := message.From
-	// text := message.Text
+	text := message.Text
 
 	if user == nil {
 		return
 	}
 
-	// log.Printf("%s wrote %s", user.FirstName, text)
+	log.Printf("%s wrote %s", user.FirstName, text)
 	if isExtraMessage(message) {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
