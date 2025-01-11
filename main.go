@@ -120,9 +120,9 @@ func handleUpdate(update tgbotapi.Update) {
 		handleButton(update.CallbackQuery)
 		break
 	default:
-		log.Printf("%v", update)
+		// log.Printf("%v", update)
 		webhook, _ := bot.GetWebhookInfo()
-		log.Printf("%v", webhook)
+		// log.Printf("%v", webhook)
 		break
 	}
 }
