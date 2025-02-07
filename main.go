@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -24,6 +25,7 @@ var (
 	// Store bot screaming status
 	screaming = false
 	bot       *tgbotapi.BotAPI
+	botscope  *tgbotapi.BotAPI
 
 	// Keyboard layout for the first menu. One button, one row
 	firstMenuMarkup = tgbotapi.NewInlineKeyboardMarkup(
@@ -146,7 +148,7 @@ func handleMessage(message *tgbotapi.Message) {
 	}
 
 	log.Printf("%s wrote %s", user.FirstName, text)
-	if isExtraMessage(message) {
+	if isExtraMessage(message) || strings.Contains(message.Text, "given away") {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		// var lowerName = strings.ToLower(user.FirstName)
@@ -171,12 +173,25 @@ func handleMessage(message *tgbotapi.Message) {
 		// }
 	}
 
+	if user.UserName == "" {
+		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
+		_, _ = bot.Send(deletemsag)
+		return
+	}
+
 	var err error
+	if message.Text == "/testBotCommand" {
+		// botScope := tgbotapi.NewBotCommandScopeChatMember(message.Chat.ID, user.ID)
+		// msg := tgbotapi.NewMessage(message.Chat.ID, strings.ToUpper(text))
+		// bot.Request
+		// _, err = botScope.Send(msg)
+	}
 	// webhook, err := bot.GetWebhookInfo()
 	// log.Printf("%v", webhook)
 	// if strings.HasPrefix(text, "/") {
 	// 	err = handleCommand(message.Chat.ID, text)
-	// } else if screaming && len(text) > 0 {
+	// }
+	//  else if screaming && len(text) > 0 {
 	// 	msg := tgbotapi.NewMessage(message.Chat.ID, strings.ToUpper(text))
 	// 	// To preserve markdown, we attach entities (bold, italic..)
 	// 	msg.Entities = message.Entities
@@ -240,6 +255,9 @@ func handleCommand(chatId int64, command string) error {
 	var err error
 
 	// switch command {
+	// case "/testBotCommand":
+	// 	err = testBotCommand()
+	// 	break
 	// case "/scream":
 	// 	screaming = true
 	// 	break
