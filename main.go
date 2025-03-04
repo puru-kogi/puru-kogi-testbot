@@ -148,7 +148,11 @@ func handleMessage(message *tgbotapi.Message) {
 	}
 
 	log.Printf("%s wrote %s", user.FirstName, text)
-	if isExtraMessage(message) || strings.Contains(message.Text, "given away") {
+	if isExtraMessage(message) ||
+		strings.Contains(message.Text, "given away") ||
+		strings.Contains(message.Text, "❗️❗️❗️@") ||
+		strings.Contains(message.Text, "reward_bot") ||
+		strings.Contains(message.Text, "Take here") {
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		// var lowerName = strings.ToLower(user.FirstName)
