@@ -147,7 +147,7 @@ func handleMessage(message *tgbotapi.Message) {
 		return
 	}
 
-	log.Printf("%s(%s) wrote %s", user.FirstName, message.From.LanguageCode, text)
+	log.Printf("%s (%s) wrote %s", user.FirstName, message.From.LanguageCode, text)
 	if isExtraMessage(message) ||
 		strings.Contains(message.Text, "given away") ||
 		strings.Contains(message.Text, "❗️❗️❗️@") ||
@@ -157,7 +157,7 @@ func handleMessage(message *tgbotapi.Message) {
 		_, _ = bot.Send(deletemsag)
 		// var lowerName = strings.ToLower(user.FirstName)
 		// if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
-		log.Printf("del message id : %d firstName : %s LastName : %s BAN!", user.ID, user.FirstName, user.LastName)
+		log.Printf("del message id : %d firstName : %s LastName : %s BAN! %s", user.ID, user.FirstName, user.LastName, text)
 		memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 		restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
 			Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
@@ -178,6 +178,7 @@ func handleMessage(message *tgbotapi.Message) {
 	}
 
 	if user.UserName == "" {
+		log.Printf("del message id : %d firstName : %s LastName : %s DELETE! %s", user.ID, user.FirstName, user.LastName, text)
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		return
