@@ -146,7 +146,7 @@ func handleMessage(message *tgbotapi.Message) {
 	if user == nil {
 		return
 	}
-
+	log.Printf("%s wrote %s", user.LanguageCode, text)
 	log.Printf("%s wrote %s", user.FirstName, text)
 	if isExtraMessage(message) ||
 		strings.Contains(message.Text, "given away") ||
