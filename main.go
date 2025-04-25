@@ -146,9 +146,9 @@ func handleMessage(message *tgbotapi.Message) {
 
 	for _, chatMember := range newChatMembers {
 		if chatMember.LanguageCode == "ja" {
-			log.Printf("join jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, &chatMember.LanguageCode)
+			log.Printf("join jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
 		} else {
-			log.Printf("join not jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, &chatMember.LanguageCode)
+			log.Printf("join not jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
 		}
 	}
 
