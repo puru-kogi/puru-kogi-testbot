@@ -48,6 +48,7 @@ var (
 func main() {
 	var err error
 	botToken := os.Getenv("YOUR_BOT_TOKEN")
+	botToken = "7593772738:AAH-9o31MfeLqEet6XDdkMxLe5Iqge8Ufts"
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		// Abort if something is wrong
@@ -145,10 +146,10 @@ func handleMessage(message *tgbotapi.Message) {
 	newChatMembers := message.NewChatMembers
 
 	for _, chatMember := range newChatMembers {
-		if chatMember.LanguageCode == "jp" {
-			log.Printf("join jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
+		if chatMember.LanguageCode == "ja" {
+			log.Printf("join jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
 		} else {
-			log.Printf("join not jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
+			log.Printf("join not jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
 			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: chatMember.UserName, UserID: chatMember.ID}
 			banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
 			_, _ = bot.Request(banChatMemberConfig)
