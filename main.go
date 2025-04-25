@@ -145,10 +145,14 @@ func handleMessage(message *tgbotapi.Message) {
 	newChatMembers := message.NewChatMembers
 
 	for _, chatMember := range newChatMembers {
-		if chatMember.LanguageCode == "ja" {
+		if chatMember.LanguageCode == "jp" {
 			log.Printf("join jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
 		} else {
 			log.Printf("join not jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
+			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: chatMember.UserName, UserID: chatMember.ID}
+			banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
+			_, _ = bot.Request(banChatMemberConfig)
+			return
 		}
 	}
 
