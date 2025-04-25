@@ -50,7 +50,6 @@ func main() {
 	botToken := os.Getenv("YOUR_BOT_TOKEN")
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
-		00
 		// Abort if something is wrong
 		log.Panic(err)
 	}
