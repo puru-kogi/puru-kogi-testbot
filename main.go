@@ -50,6 +50,7 @@ func main() {
 	botToken := os.Getenv("YOUR_BOT_TOKEN")
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
+		00
 		// Abort if something is wrong
 		log.Panic(err)
 	}
@@ -142,6 +143,15 @@ func handleChatJoinRequest(member *tgbotapi.ChatJoinRequest) {
 func handleMessage(message *tgbotapi.Message) {
 	user := message.From
 	text := message.Text
+	newChatMembers := message.NewChatMembers
+
+	for _, chatMember := range newChatMembers {
+		if chatMember.LanguageCode == "ja" {
+			log.Printf("join jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, &chatMember.LanguageCode)
+		} else {
+			log.Printf("join not jp id : %d firstName : %s LastName : %s jp %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, &chatMember.LanguageCode)
+		}
+	}
 
 	if user == nil {
 		return
