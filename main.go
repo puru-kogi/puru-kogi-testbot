@@ -162,6 +162,7 @@ func handleMessage(message *tgbotapi.Message) {
 
 	log.Printf("%s (%s) wrote %s", user.FirstName, message.From.LanguageCode, text)
 	if isExtraMessage(message) ||
+		(strings.HasPrefix(message.Text, "@") && strings.HasSuffix(message.Text, "bot")) ||
 		strings.Contains(message.Text, "given away") ||
 		strings.Contains(message.Text, "❗️❗️❗️@") ||
 		strings.Contains(message.Text, "reward_bot") ||
