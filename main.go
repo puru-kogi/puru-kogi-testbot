@@ -142,19 +142,19 @@ func handleChatJoinRequest(member *tgbotapi.ChatJoinRequest) {
 func handleMessage(message *tgbotapi.Message) {
 	user := message.From
 	text := message.Text
-	newChatMembers := message.NewChatMembers
+	// newChatMembers := message.NewChatMembers
 
-	for _, chatMember := range newChatMembers {
-		if chatMember.LanguageCode == "ja" {
-			log.Printf("join jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
-		} else {
-			log.Printf("join not jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
-			memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: chatMember.UserName, UserID: chatMember.ID}
-			banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
-			_, _ = bot.Request(banChatMemberConfig)
-			return
-		}
-	}
+	// for _, chatMember := range newChatMembers {
+	// if chatMember.LanguageCode == "ja" {
+	// 	log.Printf("join jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
+	// } else {
+	// 	log.Printf("join not jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
+	// 	memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: chatMember.UserName, UserID: chatMember.ID}
+	// 	banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
+	// 	_, _ = bot.Request(banChatMemberConfig)
+	// 	return
+	// }
+	// }
 
 	if user == nil {
 		return
