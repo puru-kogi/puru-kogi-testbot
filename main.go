@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -161,8 +162,10 @@ func handleMessage(message *tgbotapi.Message) {
 	}
 
 	log.Printf("%s (%s) wrote %s", user.FirstName, message.From.LanguageCode, text)
+
+	regex, _ := regexp.Compile(`@.+[bB][oO][tT]`)
+
 	if isExtraMessage(message) ||
-		(strings.HasPrefix(message.Text, "@") && strings.HasSuffix(message.Text, "bot")) ||
 		strings.Contains(message.Text, "given away") ||
 		strings.Contains(message.Text, "❗️❗️❗️@") ||
 		strings.Contains(message.Text, "reward_bot") ||
@@ -191,7 +194,8 @@ func handleMessage(message *tgbotapi.Message) {
 		// }
 	}
 
-	if user.UserName == "" {
+	if (regex.MatchString(message.Text)) ||
+		user.UserName == "" {
 		log.Printf("del message id : %d firstName : %s LastName : %s DELETE! %s", user.ID, user.FirstName, user.LastName, text)
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
