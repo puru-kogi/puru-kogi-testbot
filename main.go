@@ -164,8 +164,12 @@ func handleMessage(message *tgbotapi.Message) {
 	log.Printf("%s (%s) wrote %s", user.FirstName, message.From.LanguageCode, text)
 
 	regex, _ := regexp.Compile(`@.+[bB][oO][tT]`)
-
+	regex2, _ := regexp.Compile(`又.+了`)
 	if isExtraMessage(message) ||
+		regex2.MatchString(message.Text) ||
+		strings.Contains(message.Text, "某些") ||
+		strings.Contains(message.Text, "钱了") ||
+		strings.Contains(message.Text, "行情") ||
 		strings.Contains(message.Text, "given away") ||
 		strings.Contains(message.Text, "❗️❗️❗️@") ||
 		strings.Contains(message.Text, "reward_bot") ||
