@@ -262,38 +262,38 @@ func handleMessage(message *tgbotapi.Message) {
 		chatMember.Status == "" &&
 		message.From.LanguageCode != "ja" { // Construct a new message from the given chat ID and containing
 
-		lastDataMap, _ := readDataMap()
-		key := strconv.FormatInt(message.Chat.ID, 10)
+		// lastDataMap, _ := readDataMap()
+		// key := strconv.FormatInt(message.Chat.ID, 10)
 
-		if lastData, ok := lastDataMap[key]; !ok {
+		// if lastData, ok := lastDataMap[key]; !ok {
+		// } else {
+		// 	if !containsString(lastData, "@"+user.UserName) {
+		log.Printf(chatMember.Status) // creator administrator
+		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
+		_, _ = bot.Send(deletemsag)
+		var msg tgbotapi.MessageConfig
+		if message.From.LanguageCode == "" {
+			// the text that we received.
+			msg = tgbotapi.NewMessage(message.Chat.ID, "スキャム対策の強化の為、Botを開始してください。")
+
+			msg.ReplyMarkup = numericKeyboard
+
 		} else {
-			if !containsString(lastData, "@"+user.UserName) {
-				log.Printf(chatMember.Status) // creator administrator
-				deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
-				_, _ = bot.Send(deletemsag)
-				var msg tgbotapi.MessageConfig
-				if message.From.LanguageCode == "" {
-					// the text that we received.
-					msg = tgbotapi.NewMessage(message.Chat.ID, "スキャム対策の強化の為、Botを開始してください。")
-
-					msg.ReplyMarkup = numericKeyboard
-
-				} else {
-					// msg = tgbotapi.NewMessage(message.Chat.ID, "日本専用チャンネルです。")
-					return
-				}
-				// Send the message.
-				annotation, err := bot.Send(msg)
-				if err != nil {
-					panic(err)
-				}
-				_ = time.AfterFunc(time.Second*5, func() {
-					// 5秒後にこの関数が実行される
-					deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
-					_, _ = bot.Send(deletemsag)
-				})
-			}
+			// msg = tgbotapi.NewMessage(message.Chat.ID, "日本専用チャンネルです。")
+			return
 		}
+		// Send the message.
+		annotation, err := bot.Send(msg)
+		if err != nil {
+			panic(err)
+		}
+		_ = time.AfterFunc(time.Second*5, func() {
+			// 5秒後にこの関数が実行される
+			deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
+			_, _ = bot.Send(deletemsag)
+		})
+		// }
+		// }
 	}
 	if (chatMember.Status != "") &&
 		strings.HasPrefix(text, "/") {
