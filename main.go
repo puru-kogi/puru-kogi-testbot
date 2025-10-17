@@ -293,7 +293,7 @@ func handleMessage(message *tgbotapi.Message) {
 		if err != nil {
 			panic(err)
 		}
-		_ = time.AfterFunc(time.Second*5, func() {
+		_ = time.AfterFunc(time.Second*20, func() {
 			// 5秒後にこの関数が実行される
 			deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
 			_, _ = bot.Send(deletemsag)
