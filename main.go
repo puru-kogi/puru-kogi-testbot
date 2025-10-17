@@ -265,7 +265,7 @@ func handleMessage(message *tgbotapi.Message) {
 	}
 
 	if !message.From.IsBot &&
-		chatMember.Status == "" &&
+		chatMember.Status == "member" &&
 		message.From.LanguageCode != "ja" { // Construct a new message from the given chat ID and containing
 		log.Printf("not ja")
 
