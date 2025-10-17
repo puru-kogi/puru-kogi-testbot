@@ -19,7 +19,7 @@ import (
 
 var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonURL("開始する", "https://t.me/burigoki_bot"),
+		tgbotapi.NewInlineKeyboardButtonURL("確認する", "https://t.me/burigoki_bot"),
 	),
 	// tgbotapi.NewInlineKeyboardRow(
 	// 	tgbotapi.NewInlineKeyboardButtonData("4", "4"),
@@ -252,6 +252,19 @@ func handleMessage(message *tgbotapi.Message) {
 		log.Printf("del message id : %d firstName : %s LastName : %s DELETE! %s", user.ID, user.FirstName, user.LastName, text)
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
+
+		var msg tgbotapi.MessageConfig
+		val := fmt.Sprintf("@%s \n ユーザーID(Username)なしの場合、発言出来ません。\nテレグラムの設定からユーザーIDを設定して下さい。", user.UserName)
+		msg = tgbotapi.NewMessage(message.Chat.ID, val)
+		annotation, err := bot.Send(msg)
+		if err != nil {
+			panic(err)
+		}
+		_ = time.AfterFunc(time.Second*15, func() {
+			// 5秒後にこの関数が実行される
+			deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
+			_, _ = bot.Send(deletemsag)
+		})
 		return
 	}
 	chatConfigWithUser := tgbotapi.ChatConfigWithUser{ChatID: message.Chat.ID, SuperGroupUsername: user.UserName, UserID: user.ID}
@@ -280,7 +293,8 @@ func handleMessage(message *tgbotapi.Message) {
 		var msg tgbotapi.MessageConfig
 		if message.From.LanguageCode == "" {
 			// the text that we received.
-			msg = tgbotapi.NewMessage(message.Chat.ID, "スキャム対策の強化の為、Botを開始してください。")
+			val := fmt.Sprintf("@%s \n スキャム対策用にすごく簡単な以下のBotの確認をお願いします。", user.UserName)
+			msg = tgbotapi.NewMessage(message.Chat.ID, val)
 
 			msg.ReplyMarkup = numericKeyboard
 
