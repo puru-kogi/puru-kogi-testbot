@@ -3,14 +3,29 @@ package main
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
+
+var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
+	tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonURL("開始する", "https://t.me/burigoki_bot"),
+	),
+	// tgbotapi.NewInlineKeyboardRow(
+	// 	tgbotapi.NewInlineKeyboardButtonData("4", "4"),
+	// 	tgbotapi.NewInlineKeyboardButtonData("5", "5"),
+	// 	tgbotapi.NewInlineKeyboardButtonData("6", "6"),
+	// ),
 )
 
 var (
@@ -45,6 +60,39 @@ var (
 		),
 	)
 )
+
+func writeDataMap(dataMap *map[string][]string) error {
+	if len(*dataMap) == 0 {
+		// do nothing
+		return nil
+	}
+	bytes, _ := json.Marshal(*dataMap)
+	currentDir, _ := os.Getwd()
+
+	filePath := filepath.Join(currentDir, "tmp", "lastdata.json")
+	_, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		file, err := os.Create(filePath)
+		if err != nil {
+			fmt.Printf("ファイル作成に失敗しました: %v\n", err)
+			return nil
+		}
+		defer file.Close()
+	}
+	return os.WriteFile(filePath, bytes, os.FileMode(0600))
+}
+
+func readDataMap() (dataMap map[string][]string, err error) {
+	currentDir, _ := os.Getwd()
+	filePath := filepath.Join(currentDir, "tmp", "lastdata.json")
+	file, err := os.ReadFile(filePath)
+	if err != nil {
+		// do nothing
+		return nil, err
+	}
+	err = json.Unmarshal(file, &dataMap)
+	return
+}
 
 func main() {
 	var err error
@@ -165,6 +213,7 @@ func handleMessage(message *tgbotapi.Message) {
 
 	regex, _ := regexp.Compile(`@.+[bB][oO][tT]`)
 	regex2, _ := regexp.Compile(`又.+了`)
+	memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 	if isExtraMessage(message) ||
 		regex2.MatchString(message.Text) ||
 		strings.Contains(message.Text, "某些") ||
@@ -179,7 +228,7 @@ func handleMessage(message *tgbotapi.Message) {
 		// var lowerName = strings.ToLower(user.FirstName)
 		// if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
 		log.Printf("del message id : %d firstName : %s LastName : %s BAN! %s", user.ID, user.FirstName, user.LastName, text)
-		memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
+		// memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 		restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
 			Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
 				CanSendMediaMessages:  false,
@@ -205,32 +254,51 @@ func handleMessage(message *tgbotapi.Message) {
 		_, _ = bot.Send(deletemsag)
 		return
 	}
-
+	chatConfigWithUser := tgbotapi.ChatConfigWithUser{ChatID: message.Chat.ID, SuperGroupUsername: user.UserName, UserID: user.ID}
+	getChatMemberConfig := tgbotapi.GetChatMemberConfig{ChatConfigWithUser: chatConfigWithUser}
+	chatMember, _ := bot.GetChatMember(getChatMemberConfig)
 	var err error
-	if message.Text == "/testBotCommand" {
-		// botScope := tgbotapi.NewBotCommandScopeChatMember(message.Chat.ID, user.ID)
-		// msg := tgbotapi.NewMessage(message.Chat.ID, strings.ToUpper(text))
-		// bot.Request
-		// _, err = botScope.Send(msg)
-	}
-	// webhook, err := bot.GetWebhookInfo()
-	// log.Printf("%v", webhook)
-	// if strings.HasPrefix(text, "/") {
-	// 	err = handleCommand(message.Chat.ID, text)
-	// }
-	//  else if screaming && len(text) > 0 {
-	// 	msg := tgbotapi.NewMessage(message.Chat.ID, strings.ToUpper(text))
-	// 	// To preserve markdown, we attach entities (bold, italic..)
-	// 	msg.Entities = message.Entities
-	// 	// _, err = bot.Send(msg)
-	// 	log.Printf("%s wrote %s", user.FirstName, msg)
-	// } else {
-	// 	// This is equivalent to forwarding, without the sender's name
-	// 	copyMsg := tgbotapi.NewCopyMessage(message.Chat.ID, message.Chat.ID, message.MessageID)
-	// 	// _, err = bot.CopyMessage(copyMsg)
-	// 	log.Printf("%s wrote %s", user.FirstName, copyMsg)
-	// }
+	if !message.From.IsBot &&
+		chatMember.Status == "" &&
+		message.From.LanguageCode != "ja" { // Construct a new message from the given chat ID and containing
 
+		lastDataMap, _ := readDataMap()
+		key := strconv.FormatInt(message.Chat.ID, 10)
+
+		if lastData, ok := lastDataMap[key]; !ok {
+		} else {
+			if !containsString(lastData, "@"+user.UserName) {
+				log.Printf(chatMember.Status) // creator administrator
+				deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
+				_, _ = bot.Send(deletemsag)
+				var msg tgbotapi.MessageConfig
+				if message.From.LanguageCode == "" {
+					// the text that we received.
+					msg = tgbotapi.NewMessage(message.Chat.ID, "スキャム対策の強化の為、Botを開始してください。")
+
+					msg.ReplyMarkup = numericKeyboard
+
+				} else {
+					// msg = tgbotapi.NewMessage(message.Chat.ID, "日本専用チャンネルです。")
+					return
+				}
+				// Send the message.
+				annotation, err := bot.Send(msg)
+				if err != nil {
+					panic(err)
+				}
+				_ = time.AfterFunc(time.Second*5, func() {
+					// 5秒後にこの関数が実行される
+					deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
+					_, _ = bot.Send(deletemsag)
+				})
+			}
+		}
+	}
+	if (chatMember.Status != "") &&
+		strings.HasPrefix(text, "/") {
+		err = handleCommand(message.Chat.ID, text)
+	}
 	if err != nil {
 		log.Printf("An error occured: %s", err.Error())
 	}
@@ -280,23 +348,31 @@ func isExtraMessage(message *tgbotapi.Message) bool {
 // When we get a command, we react accordingly
 func handleCommand(chatId int64, command string) error {
 	var err error
+	splitCommands := strings.Split(command, " ")
+	if len(splitCommands) < 1 {
+		return err
+	}
+	commandPrefix := splitCommands[0]
+	switch commandPrefix {
 
-	// switch command {
-	// case "/testBotCommand":
-	// 	err = testBotCommand()
-	// 	break
-	// case "/scream":
-	// 	screaming = true
-	// 	break
+	case "/addIgnoreUser":
+		err = addIgnoreUser(chatId, command)
+		break
+		// case "/testBotCommand":
+		// 	err = testBotCommand()
+		// 	break
+		// case "/scream":
+		// 	screaming = true
+		// 	break
 
-	// case "/whisper":
-	// 	screaming = false
-	// 	break
+		// case "/whisper":
+		// 	screaming = false
+		// 	break
 
-	// case "/menu":
-	// 	err = sendMenu(chatId)
-	// 	break
-	// }
+		// case "/menu":
+		// 	err = sendMenu(chatId)
+		// 	break
+	}
 
 	return err
 }
@@ -324,6 +400,46 @@ func handleButton(query *tgbotapi.CallbackQuery) {
 	bot.Send(msg)
 }
 
+func addIgnoreUser(chatId int64, command string) error {
+	var err error
+	splitCommands := strings.Split(command, " ")
+	if len(splitCommands) < 2 {
+		return err
+	}
+	commandusername := splitCommands[1]
+	if !strings.HasPrefix(commandusername, "@") {
+		return err
+	}
+	// 前回の値の取り込みと今回の値の準備
+	lastDataMap, _ := readDataMap()
+	var newDataMap = map[string][]string{}
+
+	// 現在のデータを集め、TestKeyという名前で登録する
+	key := strconv.FormatInt(chatId, 10)
+	var newData []string
+	newDataMap[strconv.FormatInt(chatId, 10)] = newData
+
+	// 差分計算
+	if lastData, ok := lastDataMap[key]; !ok {
+		newData = []string{commandusername}
+		newDataMap[key] = newData
+	} else {
+		// 前回の値との差分を求める
+		if !containsString(lastData, commandusername) {
+			newData = append(lastData, commandusername)
+			newDataMap[key] = newData
+		} else {
+			return err
+		}
+	}
+
+	// 現在のデータを保存
+	err2 := writeDataMap(&newDataMap)
+
+	log.Println(err2)
+	return err
+}
+
 //	func removeScam() error {
 //		var err : error
 //		tgbotapi.
@@ -343,4 +459,13 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func containsString(slice []string, target string) bool {
+	for _, value := range slice {
+		if value == target {
+			return true
+		}
+	}
+	return false
 }
