@@ -258,9 +258,16 @@ func handleMessage(message *tgbotapi.Message) {
 	getChatMemberConfig := tgbotapi.GetChatMemberConfig{ChatConfigWithUser: chatConfigWithUser}
 	chatMember, _ := bot.GetChatMember(getChatMemberConfig)
 	var err error
+	if !message.From.IsBot {
+		log.Printf("status : (%s) language : (%s) ", chatMember.Status, message.From.LanguageCode)
+	} else {
+		log.Printf("bot status : (%s) language : (%s) ", chatMember.Status, message.From.LanguageCode)
+	}
+
 	if !message.From.IsBot &&
 		chatMember.Status == "" &&
 		message.From.LanguageCode != "ja" { // Construct a new message from the given chat ID and containing
+		log.Printf("not ja")
 
 		// lastDataMap, _ := readDataMap()
 		// key := strconv.FormatInt(message.Chat.ID, 10)
@@ -268,7 +275,6 @@ func handleMessage(message *tgbotapi.Message) {
 		// if lastData, ok := lastDataMap[key]; !ok {
 		// } else {
 		// 	if !containsString(lastData, "@"+user.UserName) {
-		log.Printf(chatMember.Status) // creator administrator
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 		var msg tgbotapi.MessageConfig
