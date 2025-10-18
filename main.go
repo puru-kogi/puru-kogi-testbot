@@ -254,7 +254,7 @@ func handleMessage(message *tgbotapi.Message) {
 		_, _ = bot.Send(deletemsag)
 
 		var msg tgbotapi.MessageConfig
-		val := fmt.Sprintf("@%s \n ユーザーID(Username)なしの場合、発言出来ません。\nテレグラムの設定からユーザーIDを設定して下さい。", user.UserName)
+		val := fmt.Sprintf("@%s %s \n ユーザーID(Username)なしの場合、発言出来ません。\nテレグラムの設定からユーザーIDを設定して下さい。", user.FirstName, user.LastName)
 		msg = tgbotapi.NewMessage(message.Chat.ID, val)
 		annotation, err := bot.Send(msg)
 		if err != nil {
