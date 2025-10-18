@@ -19,7 +19,7 @@ import (
 
 var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonURL("確認する", "https://t.me/burigoki_bot"),
+		tgbotapi.NewInlineKeyboardButtonURL("確認する", "https://t.me/puru_kogi_testbot"),
 	),
 	// tgbotapi.NewInlineKeyboardRow(
 	// 	tgbotapi.NewInlineKeyboardButtonData("4", "4"),
@@ -280,7 +280,7 @@ func handleMessage(message *tgbotapi.Message) {
 	if !message.From.IsBot &&
 		chatMember.Status == "member" &&
 		message.From.LanguageCode != "ja" { // Construct a new message from the given chat ID and containing
-		// log.Printf("not ja")
+		log.Printf("not ja")
 
 		// lastDataMap, _ := readDataMap()
 		// key := strconv.FormatInt(message.Chat.ID, 10)
@@ -288,30 +288,30 @@ func handleMessage(message *tgbotapi.Message) {
 		// if lastData, ok := lastDataMap[key]; !ok {
 		// } else {
 		// 	if !containsString(lastData, "@"+user.UserName) {
-		// 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
-		// 		_, _ = bot.Send(deletemsag)
-		// 		var msg tgbotapi.MessageConfig
-		// 		if message.From.LanguageCode == "" {
-		// 			// the text that we received.
-		// 			val := fmt.Sprintf("@%s \n スキャム対策用にすごく簡単な以下のBotの確認をお願いします。", user.UserName)
-		// 			msg = tgbotapi.NewMessage(message.Chat.ID, val)
+		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
+		_, _ = bot.Send(deletemsag)
+		var msg tgbotapi.MessageConfig
+		if message.From.LanguageCode == "" {
+			// the text that we received.
+			val := fmt.Sprintf("@%s \n スキャム対策用にすごく簡単な以下のBotの確認をお願いします。", user.UserName)
+			msg = tgbotapi.NewMessage(message.Chat.ID, val)
 
-		// 			msg.ReplyMarkup = numericKeyboard
+			msg.ReplyMarkup = numericKeyboard
 
-		// 		} else {
-		// 			// msg = tgbotapi.NewMessage(message.Chat.ID, "日本専用チャンネルです。")
-		// 			return
-		// 		}
-		// 		// Send the message.
-		// 		annotation, err := bot.Send(msg)
-		// 		if err != nil {
-		// 			panic(err)
-		// 		}
-		// 		_ = time.AfterFunc(time.Second*20, func() {
-		// 			// 5秒後にこの関数が実行される
-		// 			deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
-		// 			_, _ = bot.Send(deletemsag)
-		// 		})
+		} else {
+			// msg = tgbotapi.NewMessage(message.Chat.ID, "日本専用チャンネルです。")
+			return
+		}
+		// Send the message.
+		annotation, err := bot.Send(msg)
+		if err != nil {
+			panic(err)
+		}
+		_ = time.AfterFunc(time.Second*20, func() {
+			// 5秒後にこの関数が実行される
+			deletemsag = tgbotapi.NewDeleteMessage(annotation.Chat.ID, annotation.MessageID)
+			_, _ = bot.Send(deletemsag)
+		})
 		// 	}
 		// }
 	}
