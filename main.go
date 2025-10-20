@@ -293,7 +293,7 @@ func handleMessage(message *tgbotapi.Message) {
 		var msg tgbotapi.MessageConfig
 		if message.From.LanguageCode == "" {
 			// the text that we received.
-			val := fmt.Sprintf("@%s \n スキャム対策用にすごく簡単な以下のBotの確認をお願いします。", user.UserName)
+			val := fmt.Sprintf("@%s \n ぷるこぎ自作スキャム対策BOTです。\n 発言制限解除の為の、確認をお願いします。", user.UserName)
 			msg = tgbotapi.NewMessage(message.Chat.ID, val)
 
 			msg.ReplyMarkup = numericKeyboard
