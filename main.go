@@ -61,6 +61,8 @@ var (
 	)
 )
 
+var deleteCountMap map[string]int
+
 func writeDataMap(dataMap *map[string][]string) error {
 	if len(*dataMap) == 0 {
 		// do nothing
@@ -96,6 +98,7 @@ func readDataMap() (dataMap map[string][]string, err error) {
 
 func main() {
 	var err error
+	deleteCountMap = make(map[string]int)
 	botToken := os.Getenv("YOUR_BOT_TOKEN")
 	bot, err = tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -103,31 +106,15 @@ func main() {
 		log.Panic(err)
 	}
 
-	// baseURL := "https://api.telegram.org/bot"
-	// endpoint := baseURL + botToken + "/sendMessage&Updates"
-	// endpoint2 := baseURL + botToken + "/chatJoinRequest"
-	// Set this to true to log all interactions with telegram servers
 	bot.Debug = false
 
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
-	// tes := tgbotapi.NewUpdate(1)
-	// ApproveChatJoinRequestConfig()
-	// Create a new cancellable background context. Calling `cancel()` leads to the cancellation of the context
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
-
-	// // `updates` is a golang channel which receives telegram updates
 	updates := bot.GetUpdatesChan(u)
-	// upd := bot.GetUpdatesChan()
-
-	// Pass cancellable context to goroutine
 	go receiveUpdates(ctx, updates)
-
-	// Tell the user the bot is online
 	log.Println("Start listening for updates. Press enter to stop")
-
-	// Wait for a newline symbol, then cancel handling updates
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
 	cancel()
 
@@ -137,13 +124,10 @@ func main() {
 }
 
 func receiveUpdates(ctx context.Context, updates tgbotapi.UpdatesChannel) {
-	// `for {` means the loop is infinite until we manually stop it
 	for {
 		select {
-		// stop looping if ctx is cancelled
 		case <-ctx.Done():
 			return
-		// receive update from channel and then handle it
 		case update := <-updates:
 			handleUpdate(update)
 		}
@@ -154,22 +138,18 @@ func handleUpdate(update tgbotapi.Update) {
 	switch {
 	case update.ChannelPost != nil:
 		log.Printf("ChannelPost")
-		break
 	case update.ChatJoinRequest != nil:
 		log.Printf("ChatJoinRequest")
 		handleChatJoinRequest(update.ChatJoinRequest)
-		break
 	// Handle messages
 	case update.Message != nil:
 		// log.Printf("Message")
 		handleMessage(update.Message)
-		break
 
 	// Handle button clicks
 	case update.CallbackQuery != nil:
 		log.Printf("CallbackQuery")
 		handleButton(update.CallbackQuery)
-		break
 	default:
 		// log.Printf("%v", update)
 		// webhook, _ := bot.GetWebhookInfo()
@@ -179,31 +159,11 @@ func handleUpdate(update tgbotapi.Update) {
 }
 
 func handleChatJoinRequest(member *tgbotapi.ChatJoinRequest) {
-	// str := fmt.Sprintf("%+v\n", member)
-	// msg := tgbotapi.NewMessage(member.Chat.ID, str)
-	// _, err = bot.Send(msg)
-
-	// if err != nil {
-	// 	log.Printf("An error occured: %s", err.Error())
-	// }
 }
 
 func handleMessage(message *tgbotapi.Message) {
 	user := message.From
 	text := message.Text
-	// newChatMembers := message.NewChatMembers
-
-	// for _, chatMember := range newChatMembers {
-	// if chatMember.LanguageCode == "ja" {
-	// 	log.Printf("join jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
-	// } else {
-	// 	log.Printf("join not jp id : %d firstName : %s LastName : %s language %s", chatMember.ID, chatMember.FirstName, chatMember.LastName, chatMember.LanguageCode)
-	// 	memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: chatMember.UserName, UserID: chatMember.ID}
-	// 	banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
-	// 	_, _ = bot.Request(banChatMemberConfig)
-	// 	return
-	// }
-	// }
 
 	if user == nil {
 		return
@@ -213,7 +173,6 @@ func handleMessage(message *tgbotapi.Message) {
 
 	regex, _ := regexp.Compile(`@.+[bB][oO][tT]`)
 	regex2, _ := regexp.Compile(`又.+了`)
-	memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
 	if isExtraMessage(message) ||
 		regex2.MatchString(message.Text) ||
 		strings.Contains(message.Text, "某些") ||
@@ -223,33 +182,23 @@ func handleMessage(message *tgbotapi.Message) {
 		strings.Contains(message.Text, "❗️❗️❗️@") ||
 		strings.Contains(message.Text, "reward_bot") ||
 		strings.Contains(message.Text, "Take here") {
-		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
-		_, _ = bot.Send(deletemsag)
-		// var lowerName = strings.ToLower(user.FirstName)
-		// if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
-		log.Printf("del message id : %d firstName : %s LastName : %s BAN! %s", user.ID, user.FirstName, user.LastName, text)
-		// memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
-		restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
-			Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
-				CanSendMediaMessages:  false,
-				CanSendPolls:          false,
-				CanSendOtherMessages:  false,
-				CanAddWebPagePreviews: false,
-				CanChangeInfo:         false,
-				CanInviteUsers:        false,
-				CanPinMessages:        false}}
-		banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
-		_, _ = bot.Request(restrictChatMemberConfig)
-		_, _ = bot.Request(banChatMemberConfig)
+		banUser(message)
 		return
-		// } else {
-		// 	log.Printf("del message id : %d firstName : %s LastName : %s Del only", user.ID, user.FirstName, user.LastName)
-		// }
 	}
 
 	if (regex.MatchString(message.Text)) ||
 		user.UserName == "" {
 		log.Printf("del message id : %d firstName : %s LastName : %s DELETE! %s", user.ID, user.FirstName, user.LastName, text)
+		var idStr = strconv.FormatInt(user.ID, 10)
+		deleteCount := deleteCountMap[idStr]
+		// log.Printf("id : %s deleteCount : %d", idStr, deleteCount)
+		if deleteCount > 8 {
+			// 指定回以上でBAN
+			banUser(message)
+			return
+		}
+		deleteCount += 1
+		deleteCountMap[idStr] = deleteCount
 		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
 		_, _ = bot.Send(deletemsag)
 
@@ -299,6 +248,7 @@ func handleMessage(message *tgbotapi.Message) {
 			msg.ReplyMarkup = numericKeyboard
 
 		} else {
+			banUser(message)
 			// msg = tgbotapi.NewMessage(message.Chat.ID, "日本専用チャンネルです。")
 			return
 		}
@@ -323,7 +273,31 @@ func handleMessage(message *tgbotapi.Message) {
 		log.Printf("An error occured: %s", err.Error())
 	}
 }
-
+func banUser(message *tgbotapi.Message) {
+	user := message.From
+	text := message.Text
+	var idStr = strconv.FormatInt(user.ID, 10)
+	memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
+	deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
+	_, _ = bot.Send(deletemsag)
+	// var lowerName = strings.ToLower(user.FirstName)
+	// if strings.Contains(user.FirstName, "АirDrор") || strings.Contains(lowerName, "bitgеt") || strings.Contains(lowerName, "airdrop") || strings.Contains(lowerName, "official") || strings.Contains(lowerName, "bot") {
+	log.Printf("del message id : %d firstName : %s LastName : %s BAN! %s", user.ID, user.FirstName, user.LastName, text)
+	// memberConfig := tgbotapi.ChatMemberConfig{ChatID: message.Chat.ID, ChannelUsername: user.UserName, UserID: user.ID}
+	restrictChatMemberConfig := tgbotapi.RestrictChatMemberConfig{ChatMemberConfig: memberConfig,
+		Permissions: &tgbotapi.ChatPermissions{CanSendMessages: false,
+			CanSendMediaMessages:  false,
+			CanSendPolls:          false,
+			CanSendOtherMessages:  false,
+			CanAddWebPagePreviews: false,
+			CanChangeInfo:         false,
+			CanInviteUsers:        false,
+			CanPinMessages:        false}}
+	banChatMemberConfig := tgbotapi.BanChatMemberConfig{ChatMemberConfig: memberConfig, RevokeMessages: false}
+	_, _ = bot.Request(restrictChatMemberConfig)
+	_, _ = bot.Request(banChatMemberConfig)
+	delete(deleteCountMap, idStr)
+}
 func isExtraMessage(message *tgbotapi.Message) bool {
 	var result = false
 	if message.Text == "" &&
