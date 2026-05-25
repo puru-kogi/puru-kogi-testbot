@@ -224,6 +224,7 @@ func handleMessage(message *tgbotapi.Message) {
 		log.Printf("status : (%s) language : (%s) ", chatMember.Status, message.From.LanguageCode)
 	} else {
 		log.Printf("bot status : (%s) language : (%s) ", chatMember.Status, message.From.LanguageCode)
+		log.Printf("bot FirstName : (%s) LastName : (%s) userName : (%s) ID : (%s) ", message.From.FirstName, message.From.LastName, message.From.UserName, message.From.ID)
 	}
 
 	if !message.From.IsBot &&
