@@ -224,8 +224,9 @@ func handleMessage(message *tgbotapi.Message) {
 		log.Printf("status : (%s) language : (%s) ", chatMember.Status, message.From.LanguageCode)
 	} else {
 		log.Printf("bot status : (%s) language : (%s) ", chatMember.Status, message.From.LanguageCode)
-		deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
-		_, _ = bot.Send(deletemsag)
+		// deletemsag := tgbotapi.NewDeleteMessage(message.Chat.ID, message.MessageID)
+		// _, _ = bot.Send(deletemsag)
+		banUser(message)
 		return
 	}
 
